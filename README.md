@@ -1,2 +1,3 @@
-# eldwyn_botwyn
+# BOTWYN
+
 A Twitch Death Counter Bot for Eldwyn
