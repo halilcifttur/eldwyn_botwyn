@@ -24,20 +24,27 @@ client.on('message', (channel, tags, message, self) => {
   if (self) return;
 
   // Sayaç:
-  if (message.toLowerCase() === '!ölüm')
+  else if (message.toLowerCase() === '!ölüm')
   {
     fs.readFile('./src/counter.txt', 'utf-8', (err, data) => {
       if (err) {
         console.error(err);
         return;
       }
-      client.say(channel, data);
-      return;
+
+      fs.readFile('./src/countermage.txt', 'utf-8', (err, dataMage) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        client.say(channel, `Mage Ölüm: ${dataMage} - Toplam Ölüm: ${data}`);
+        return;
+      });
     });
   }
 
   // Sayaç Artırma:
-  if (message.toLowerCase() === '!öldü')
+  else if (message.toLowerCase() === '!öldü')
   {
     const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
@@ -58,15 +65,32 @@ client.on('message', (channel, tags, message, self) => {
             return;
           }
 
-          client.say(channel, `${counter} oldu yok mu artıran KEKW`);
-          return;
+          fs.readFile('./src/countermage.txt', 'utf-8', (err, datamage) => {
+            if (err)
+            {
+              console.error(err);
+              return;
+            }
+
+            const counterMage = parseInt(datamage) + 1;
+            fs.writeFile('./src/countermage.txt', `${counterMage}`, err => {
+              if (err)
+              {
+                console.error(err);
+                return;
+              }
+
+              client.say(channel, `Mage Ölüm: ${counterMage} - Toplam Ölüm: ${counter} oldu yok mu artıran KEKW`);
+              return;
+            });
+          });
         });
       });
     }
   }
 
   // Yetki:
-  if (message.toLowerCase().includes('!yetki'))
+  else if (message.toLowerCase().includes('!yetki'))
   {
     const user = message.substring(7);
     const lowerCase = message.substring(7).toLowerCase();
@@ -103,5 +127,12 @@ client.on('message', (channel, tags, message, self) => {
         return;
       }
     }
+  }
+
+  else if (message.toLowerCase().includes('!vis'))
+  {
+    const vis = 'visbelinski';
+    client.say(channel, `${vis} git artık, istemiyoruz seni.`);
+    return;
   }
 });
