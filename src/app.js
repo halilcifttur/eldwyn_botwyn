@@ -80,7 +80,9 @@ client.on('message', (channel, tags, message, self) => {
                 return;
               }
 
-              client.say(channel, `Mage Ölüm: ${counterMage} - Toplam Ölüm: ${counter} oldu yok mu artıran KEKW`);
+              const sentences = fs.readFileSync('./src/sentence.txt', 'utf-8').split(',');
+              const randomSentence = Math.floor(Math.random() * sentences.length);
+              client.say(channel, `Mage Ölüm: ${counterMage} - Toplam Ölüm: ${counter} ${sentences[randomSentence]}`);
               return;
             });
           });
@@ -129,10 +131,40 @@ client.on('message', (channel, tags, message, self) => {
     }
   }
 
+  // Vis Özel:
   else if (message.toLowerCase().includes('!vis'))
   {
     const vis = 'visbelinski';
     client.say(channel, `${vis} git artık, istemiyoruz seni.`);
     return;
+  }
+
+  // Açıklama Ekleme:
+  else if (message.toLowerCase().includes('!ekle')) {
+
+    const sentence = message.substring(6);
+    if (sentence.length === 0)
+    {
+      client.say(channel, '!ekleden sonra cümle yazmalısın');
+      return;
+    }
+
+    const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
+    const sentences = fs.readFileSync('./src/sentence.txt', 'utf-8').split(',');
+    const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
+    if (isWriterExist)
+    {
+      sentences.push(sentence);
+      sentences.forEach(element => {
+        fs.writeFile('./src/sentence.txt', `${sentences}`, err => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+        });
+      });
+      client.say(channel, `${tags.username} isteğini ekledim.`);
+      return;
+    }
   }
 });
