@@ -180,11 +180,26 @@ client.on('message', (channel, tags, message, self) => {
     if (!message.includes('#')) {
       return;
     }
+    if (message.includes(',')) {
+      client.say(channel, 'Açıklama eklerken kelimeler arasında virgül kullanmayın.');
+      return;
+    }
 
     const sentence = message.split('#')[1];
 
     const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
     const sentences = fs.readFileSync('./src/sentence.txt', 'utf-8').split(',');
+
+    const tempSentences = [];
+    sentences.forEach(element => {
+      tempSentences.push(element.toLowerCase());
+    });
+    const isSentenceExist = (tempSentences.indexOf(sentence.toLowerCase()) > -1);
+    if (isSentenceExist) {
+      client.say(channel, 'Bu açıklama daha önce eklenmiş.');
+      return;
+    }
+
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
     if (isWriterExist)
     {
