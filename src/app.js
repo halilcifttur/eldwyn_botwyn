@@ -91,27 +91,69 @@ client.on('message', (channel, tags, message, self) => {
     }
   }
 
+  // Sayaç Eksiltme:
+  else if (message.toLowerCase() === '!ölmedi')
+  {
+    const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
+    const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
+    if (isWriterExist)
+    {
+      fs.readFile('./src/counter.txt', 'utf-8', (err, data) => {
+        if (err)
+        {
+          console.error(err);
+          return;
+        }
+
+        const counter = parseInt(data) - 1;
+        fs.writeFile('./src/counter.txt', `${counter}`, err => {
+          if (err)
+          {
+            console.error(err);
+            return;
+          }
+
+          fs.readFile('./src/countermage.txt', 'utf-8', (err, datamage) => {
+            if (err)
+            {
+              console.error(err);
+              return;
+            }
+
+            const counterMage = parseInt(datamage) - 1;
+            fs.writeFile('./src/countermage.txt', `${counterMage}`, err => {
+              if (err)
+              {
+                console.error(err);
+                return;
+              }
+
+              client.say(channel, `Mage Ölüm: ${counterMage} - Toplam Ölüm: ${counter} ama bu hile !!!`);
+              return;
+            });
+          });
+        });
+      });
+    }
+  }
+
   // Yetki:
   else if (message.toLowerCase().includes('!yetki'))
   {
-    const user = message.substring(7);
-    const lowerCase = message.substring(7).toLowerCase();
+    if (!message.includes('@')) {
+      return;
+    }
 
+    const user = message.split('@')[1];
     const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
 
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
-    const isUserExist = (allowedUsers.indexOf(lowerCase) > -1);
+    const isUserExist = (allowedUsers.indexOf(user.toLowerCase()) > -1);
     if (isWriterExist)
     {
-      if (lowerCase.length === 0)
-      {
-        client.say(channel, '!yetkiden sonra isim yazmalısın');
-        return;
-      }
-
       if (!isUserExist)
       {
-        allowedUsers.push(lowerCase);
+        allowedUsers.push(user.toLowerCase());
         allowedUsers.forEach(element => {
           fs.writeFile('./src/whitelist.txt', `${allowedUsers}`, err => {
             if (err) {
@@ -131,23 +173,15 @@ client.on('message', (channel, tags, message, self) => {
     }
   }
 
-  // Vis Özel:
-  else if (message.toLowerCase().includes('!vis'))
-  {
-    const vis = 'visbelinski';
-    client.say(channel, `${vis} git artık, istemiyoruz seni.`);
-    return;
-  }
-
   // Açıklama Ekleme:
-  else if (message.toLowerCase().includes('!ekle')) {
+  else if (message.toLowerCase().includes('!ekle'))
+  {
 
-    const sentence = message.substring(6);
-    if (sentence.length === 0)
-    {
-      client.say(channel, '!ekleden sonra cümle yazmalısın');
+    if (!message.includes('#')) {
       return;
     }
+
+    const sentence = message.split('#')[1];
 
     const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
     const sentences = fs.readFileSync('./src/sentence.txt', 'utf-8').split(',');
@@ -166,5 +200,11 @@ client.on('message', (channel, tags, message, self) => {
       client.say(channel, `${tags.username} isteğini ekledim.`);
       return;
     }
+  }
+
+  // Yardım Komutu:
+  else if (message.toLowerCase() === '!yardım')
+  {
+    client.say(channel, 'Komutlar: Ölüm Sayacı için !ölüm - Sayaca bir eklemek için: !öldü - Sayaçtan bir çıkarmak için: !ölmedi - Yetki vermek için: !yetki @[kullanıcı adı] - Yeni ölüm açıklaması eklemek için: !ekle #[açıklama] yazabilirsiniz.');
   }
 });
