@@ -192,9 +192,9 @@ client.on('message', (channel, tags, message, self) => {
 
     const tempSentences = [];
     sentences.forEach(element => {
-      tempSentences.push(element.toLowerCase());
+      tempSentences.push(element.replace(/\s/g, '').toLowerCase());
     });
-    const isSentenceExist = (tempSentences.indexOf(sentence.toLowerCase()) > -1);
+    const isSentenceExist = (tempSentences.indexOf(sentence.replace(/\s/g, '').toLowerCase()) > -1);
     if (isSentenceExist) {
       client.say(channel, 'Bu açıklama daha önce eklenmiş.');
       return;
