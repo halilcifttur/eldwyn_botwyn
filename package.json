@@ -10,7 +10,11 @@
   "author": "Elongef",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.0.0",
     "esm": "^3.2.25",
+    "knex": "^0.95.15",
+    "pg": "^8.7.3",
+    "sqlite3": "^5.0.2",
     "tmi.js": "^1.8.5"
   }
 }

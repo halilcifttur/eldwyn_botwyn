@@ -1,6 +1,7 @@
-import fs from 'fs'
+require('dotenv').config();
 import tmi from 'tmi.js'
-import { BOT_USERNAME, OAUTH_TOKEN, CHANNEL_NAME } from './constants';
+// import { BOT_USERNAME, OAUTH_TOKEN, CHANNEL_NAME } from './constants'
+import db from '../dbHelpers'
 
 const options = {
   options: { debug: true, messagesLogLevel: "info" },
@@ -9,143 +10,88 @@ const options = {
     secure: true
   },
   identity: {
-    username: BOT_USERNAME,
-    password: OAUTH_TOKEN
+    username: process.env.BOT_USERNAME,
+    password: process.env.OAUTH_TOKEN
   },
-  channels: [CHANNEL_NAME]
+  channels: [process.env.CHANNEL_NAME]
 }
 
 const client = new tmi.Client(options);
 
 client.connect().catch(console.error);
 
-client.on('message', (channel, tags, message, self) => {
+client.on('message', async (channel, tags, message, self) => { if (self) return; });
 
-  if (self) return;
+// Ölüm Sayacı:
+client.on('message', async (channel, tags, message, self) => {
 
-  // Sayaç:
-  else if (message.toLowerCase() === '!ölüm')
+  if (message.toLowerCase() === '!ölüm')
   {
-    fs.readFile('./src/counter.txt', 'utf-8', (err, data) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
+    const counter = await db.getCounter();
+    const total = counter[1];
+    const mage = counter[2];
 
-      fs.readFile('./src/countermage.txt', 'utf-8', (err, dataMage) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        client.say(channel, `Mage Ölüm: ${dataMage} - Toplam Ölüm: ${data}`);
-        return;
-      });
-    });
+    client.say(channel, `Mage Ölüm: ${mage} - Toplam Ölüm: ${total}`);
+    return;
   }
+});
 
-  // Sayaç Artırma:
-  else if (message.toLowerCase() === '!öldü')
+// Ölüm Sayacı Artırma:
+client.on('message', async (channel, tags, message, self) => {
+
+  if (message.toLowerCase() === '!öldü')
   {
-    const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
+    const allowedUsers = await db.getWhitelist();
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
     if (isWriterExist)
     {
-      fs.readFile('./src/counter.txt', 'utf-8', (err, data) => {
-        if (err)
-        {
-          console.error(err);
-          return;
-        }
+      const counter = await db.getCounter();
+      const id = counter[0];
+      const total = counter[1];
+      const mage = counter[2];
 
-        const counter = parseInt(data) + 1;
-        fs.writeFile('./src/counter.txt', `${counter}`, err => {
-          if (err)
-          {
-            console.error(err);
-            return;
-          }
+      await db.updateCounter(id, total + 1, mage + 1);
 
-          fs.readFile('./src/countermage.txt', 'utf-8', (err, datamage) => {
-            if (err)
-            {
-              console.error(err);
-              return;
-            }
-
-            const counterMage = parseInt(datamage) + 1;
-            fs.writeFile('./src/countermage.txt', `${counterMage}`, err => {
-              if (err)
-              {
-                console.error(err);
-                return;
-              }
-
-              const sentences = fs.readFileSync('./src/sentence.txt', 'utf-8').split(',');
-              const randomSentence = Math.floor(Math.random() * sentences.length);
-              client.say(channel, `Mage Ölüm: ${counterMage} - Toplam Ölüm: ${counter} ${sentences[randomSentence]}`);
-              return;
-            });
-          });
-        });
-      });
-    }
-  }
-
-  // Sayaç Eksiltme:
-  else if (message.toLowerCase() === '!ölmedi')
-  {
-    const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
-    const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
-    if (isWriterExist)
-    {
-      fs.readFile('./src/counter.txt', 'utf-8', (err, data) => {
-        if (err)
-        {
-          console.error(err);
-          return;
-        }
-
-        const counter = parseInt(data) - 1;
-        fs.writeFile('./src/counter.txt', `${counter}`, err => {
-          if (err)
-          {
-            console.error(err);
-            return;
-          }
-
-          fs.readFile('./src/countermage.txt', 'utf-8', (err, datamage) => {
-            if (err)
-            {
-              console.error(err);
-              return;
-            }
-
-            const counterMage = parseInt(datamage) - 1;
-            fs.writeFile('./src/countermage.txt', `${counterMage}`, err => {
-              if (err)
-              {
-                console.error(err);
-                return;
-              }
-
-              client.say(channel, `Mage Ölüm: ${counterMage} - Toplam Ölüm: ${counter} ama bu hile !!!`);
-              return;
-            });
-          });
-        });
-      });
-    }
-  }
-
-  // Yetki:
-  else if (message.toLowerCase().includes('!yetki'))
-  {
-    if (!message.includes('@')) {
+      const sentences = await db.getDescription();
+      const randomSentence = Math.floor(Math.random() * sentences.length);
+      client.say(channel, `Mage Ölüm: ${mage + 1} - Toplam Ölüm: ${total + 1} ${sentences[randomSentence]}`);
       return;
     }
+  }
+});
+
+// Ölüm Sayıcı Eksiltme:
+client.on('message', async (channel, tags, message, self) => {
+
+  if (message.toLowerCase() === '!ölmedi')
+  {
+    const allowedUsers = await db.getWhitelist();
+    const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
+    if (isWriterExist)
+    {
+      const counter = await db.getCounter();
+      const id = counter[0];
+      const total = counter[1];
+      const mage = counter[2];
+
+      await db.updateCounter(id, total - 1, mage - 1);
+
+      client.say(channel, `Mage Ölüm: ${mage - 1} - Toplam Ölüm: ${total - 1} ama bu hile !!!`);
+      return;
+    }
+  }
+});
+
+// Ölüm Sayacı için Yetki Verme:
+client.on('message', async (channel, tags, message, self) => {
+
+  if (message.toLowerCase().includes('!yetki'))
+  {
+    if (!message.includes('@'))
+      return;
 
     const user = message.split('@')[1];
-    const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
+    const allowedUsers = await db.getWhitelist();
 
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
     const isUserExist = (allowedUsers.indexOf(user.toLowerCase()) > -1);
@@ -153,15 +99,7 @@ client.on('message', (channel, tags, message, self) => {
     {
       if (!isUserExist)
       {
-        allowedUsers.push(user.toLowerCase());
-        allowedUsers.forEach(element => {
-          fs.writeFile('./src/whitelist.txt', `${allowedUsers}`, err => {
-            if (err) {
-              console.error(err);
-              return;
-            }
-          });
-        });
+        db.addWhitelist(user.toLowerCase())
         client.say(channel, `${user} yetkin verildi koçum`);
         return;
       }
@@ -172,53 +110,48 @@ client.on('message', (channel, tags, message, self) => {
       }
     }
   }
+});
 
-  // Açıklama Ekleme:
-  else if (message.toLowerCase().includes('!ekle'))
+// Ölüm Sayacı için Açıklama Ekleme:
+client.on('message', async (channel, tags, message, self) => {
+
+  if (message.toLowerCase().includes('!ekle'))
   {
-
-    if (!message.includes('#')) {
-      return;
-    }
-    if (message.includes(',')) {
-      client.say(channel, 'Açıklama eklerken kelimeler arasında virgül kullanmayın.');
+    if (!message.includes('#'))
+    {
       return;
     }
 
     const sentence = message.split('#')[1];
-
-    const allowedUsers = fs.readFileSync('./src/whitelist.txt', 'utf-8').split(',');
-    const sentences = fs.readFileSync('./src/sentence.txt', 'utf-8').split(',');
-
+    const sentences = await db.getDescription();
     const tempSentences = [];
+
     sentences.forEach(element => {
       tempSentences.push(element.replace(/\s/g, '').toLowerCase());
     });
     const isSentenceExist = (tempSentences.indexOf(sentence.replace(/\s/g, '').toLowerCase()) > -1);
-    if (isSentenceExist) {
+    if (isSentenceExist)
+    {
       client.say(channel, 'Bu açıklama daha önce eklenmiş.');
       return;
     }
 
+    const allowedUsers = await db.getWhitelist();
+
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
     if (isWriterExist)
     {
-      sentences.push(sentence);
-      sentences.forEach(element => {
-        fs.writeFile('./src/sentence.txt', `${sentences}`, err => {
-          if (err) {
-            console.error(err);
-            return;
-          }
-        });
-      });
+      db.addDescription(sentence);
       client.say(channel, `${tags.username} isteğini ekledim.`);
       return;
     }
   }
+});
 
-  // Yardım Komutu:
-  else if (message.toLowerCase() === '!yardım')
+// Yardım Menüsü:
+client.on('message', async (channel, tags, message, self) => {
+
+  if (message.toLowerCase() === '!yardım')
   {
     client.say(channel, 'Komutlar: Ölüm Sayacı için !ölüm - Sayaca bir eklemek için: !öldü - Sayaçtan bir çıkarmak için: !ölmedi - Yetki vermek için: !yetki @[kullanıcı adı] - Yeni ölüm açıklaması eklemek için: !ekle #[açıklama] yazabilirsiniz.');
   }
