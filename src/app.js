@@ -154,5 +154,48 @@ client.on('message', async (channel, tags, message, self) => {
   if (message.toLowerCase() === '!yardım')
   {
     client.say(channel, 'Komutlar: Ölüm Sayacı için !ölüm - Sayaca bir eklemek için: !öldü - Sayaçtan bir çıkarmak için: !ölmedi - Yetki vermek için: !yetki @[kullanıcı adı] - Yeni ölüm açıklaması eklemek için: !ekle #[açıklama] yazabilirsiniz.');
+    return;
+  }
+});
+
+// İlk Kez Sayaça Ekleme (Yalnızca Tek Seferlik):
+client.on('message', async (channel, tags, message, self) => {
+
+  if (message.toLowerCase() === '!addcounter' && tags.username == 'elongef')
+  {
+    const counter = await db.getCounter();
+    if (counter.length == 0)
+    {
+      db.addCounter()
+      client.say(channel, 'Sayaç Eklendi');
+      return;
+    }
+    else
+    {
+      client.say(channel, 'Sayaç zaten mevcut');
+      return;
+    }
+  }
+});
+
+// Manuel Sayaç Güncelleme:
+client.on('message', async (channel, tags, message, self) => {
+
+  if (message.toLowerCase().includes('!updatecounter') && tags.username == 'elongef')
+  {
+    if (!message.includes('$'))
+    {
+      return;
+    }
+
+    const splittedMessage = message.split('$')[1];
+    const total = parseInt(splittedMessage.split('-')[0]);
+    const mage = parseInt(splittedMessage.split('-')[1]);
+
+    const counter = await db.getCounter();
+    const id = counter[0];
+    db.updateCounter(id, total, mage);
+    client.say(channel , `Ölüm Sayacı Mage Ölüm: ${mage} - Toplam Ölüm: ${total} olarak güncellendi.`)
+    return;
   }
 });

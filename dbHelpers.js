@@ -5,6 +5,7 @@ export default {
   getWhitelist,
   addDescription,
   getDescription,
+  addCounter,
   updateCounter,
   getCounter
 };
@@ -47,6 +48,10 @@ async function getDescription() {
   });;
 
   return result;
+}
+
+async function addCounter() {
+  await db("counter").insert({ total: 0, mage: 0});
 }
 
 async function updateCounter(id, total, mage) {
