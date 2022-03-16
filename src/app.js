@@ -153,7 +153,7 @@ client.on('message', async (channel, tags, message, self) => {
 
   if (message.toLowerCase() === '!yardım')
   {
-    client.say(channel, 'Komutlar: Ölüm Sayacı için !ölüm - Sayaca bir eklemek için: !öldü - Sayaçtan bir çıkarmak için: !ölmedi - Yetki vermek için: !yetki @[kullanıcı adı] - Yeni ölüm açıklaması eklemek için: !ekle #[açıklama] yazabilirsiniz.');
+    client.say(channel, 'Komutlar: Ölüm Sayacı için !ölüm - Sayaca bir eklemek için: !öldü - Sayaçtan bir çıkarmak için: !ölmedi - Yetki vermek için: !yetki @[kullanıcı adı] - Yeni ölüm açıklaması eklemek için: !ekle #[açıklama] - Yetkisi olanları görüntülemek için !yetkili yazabilirsiniz.');
     return;
   }
 });
@@ -196,6 +196,19 @@ client.on('message', async (channel, tags, message, self) => {
     const id = counter[0];
     db.updateCounter(id, total, mage);
     client.say(channel , `Ölüm Sayacı Mage Ölüm: ${mage} - Toplam Ölüm: ${total} olarak güncellendi.`)
+    return;
+  }
+});
+
+// Yetkilileri Görüntüleme:
+client.on('message', async (channel, tags, message, self) => {
+
+  if (message.toLowerCase() === '!yetkili')
+  {
+    const whitelist = await db.getWhitelist();
+    const orderedList = whitelist.toString().replace(/,/g,' - ');
+
+    client.say(channel , `Yetkililer: ${orderedList}`)
     return;
   }
 });
