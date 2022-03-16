@@ -11,7 +11,7 @@ export default {
 };
 
 async function addWhitelist(name) {
-  const [id] = await db('whitelist').insert({ name: `${name}` });
+  await db('whitelist').insert({ name: `${name}` });
 }
 
 async function getWhitelist() {
@@ -31,7 +31,7 @@ async function getWhitelist() {
 }
 
 async function addDescription(text) {
-  const [id] = await db("description").insert({ text: `${text}` });
+  await db("description").insert({ text: `${text}` });
 }
 
 async function getDescription() {
