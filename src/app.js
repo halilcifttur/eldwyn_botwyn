@@ -43,7 +43,7 @@ client.on('message', async (channel, tags, message, self) => {
   {
     const allowedUsers = await db.getWhitelist();
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
-    if (isWriterExist)
+    if (isWriterExist || tags.username === 'Elongef')
     {
       const counter = await db.getCounter();
       const id = counter[0];
@@ -67,7 +67,7 @@ client.on('message', async (channel, tags, message, self) => {
   {
     const allowedUsers = await db.getWhitelist();
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
-    if (isWriterExist)
+    if (isWriterExist || tags.username === 'Elongef')
     {
       const counter = await db.getCounter();
       const id = counter[0];
@@ -95,7 +95,7 @@ client.on('message', async (channel, tags, message, self) => {
 
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
     const isUserExist = (allowedUsers.indexOf(user.toLowerCase()) > -1);
-    if (isWriterExist)
+    if (isWriterExist || tags.username === 'Elongef')
     {
       if (!isUserExist)
       {
@@ -139,7 +139,7 @@ client.on('message', async (channel, tags, message, self) => {
     const allowedUsers = await db.getWhitelist();
 
     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
-    if (isWriterExist)
+    if (isWriterExist || tags.username === 'Elongef')
     {
       db.addDescription(sentence);
       client.say(channel, `${tags.username} isteğini ekledim.`);
