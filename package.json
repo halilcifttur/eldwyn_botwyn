@@ -4,6 +4,7 @@
   "description": "Eldwyn Twitch Bot",
   "main": "src",
   "scripts": {
+    "server": "nodemon .",
     "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,6 +15,7 @@
     "esm": "^3.2.25",
     "express": "^4.17.3",
     "knex": "^0.95.15",
+    "nodemon": "^2.0.15",
     "pg": "^8.7.3",
     "sqlite3": "^5.0.2",
     "tmi.js": "^1.8.5"
