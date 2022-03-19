@@ -1,9 +1,2 @@
-require('dotenv').config();
-require = require("esm")(module)
-const server = require("./api/server");
-
-server.listen(process.env.PORT, () => {
-  console.log(`\n*** Server Running on http://localhost:${process.env.PORT}`);
-});
-
+require = require("esm")(module/*, options*/)
 module.exports = require("./app.js")

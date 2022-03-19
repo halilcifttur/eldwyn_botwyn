@@ -1,5 +1,7 @@
 require('dotenv').config();
+import express from 'express'
 import tmi from 'tmi.js'
+// import { BOT_USERNAME, OAUTH_TOKEN, CHANNEL_NAME } from './constants'
 import db from '../dbHelpers'
 
 const options = {
@@ -15,9 +17,13 @@ const options = {
   channels: [process.env.CHANNEL_NAME]
 }
 
-const client = new tmi.Client(options);
+const server = express();
 
-module.exports = client;
+server.listen(process.env.PORT, () => {
+  console.log(`\n*** Server Running on http://localhost:${process.env.PORT}`);
+});
+
+const client = new tmi.Client(options);
 
 client.connect().catch(console.error);
 
@@ -213,3 +219,29 @@ client.on('message', async (channel, tags, message, self) => {
     return;
   }
 });
+
+// API ile Ölüm Sayacı Artırma:
+server.get('/dead', async (req, res) => {
+    const counter = await db.getCounter();
+    const id = counter[0];
+    const total = counter[1];
+    const mage = counter[2];
+
+    await db.updateCounter(id, total + 1, mage + 1);
+
+    const sentences = await db.getDescription();
+    const randomSentence = Math.floor(Math.random() * sentences.length);
+    client.say(process.env.CHANNEL_NAME, `Mage Ölüm: ${mage + 1} - Toplam Ölüm: ${total + 1} ${sentences[randomSentence]}`);
+})
+
+// API ile Ölüm Sayacı Eksiltme:
+server.get('/notdead', async (req, res) => {
+    const counter = await db.getCounter();
+    const id = counter[0];
+    const total = counter[1];
+    const mage = counter[2];
+
+    await db.updateCounter(id, total - 1, mage - 1);
+
+    client.say(process.env.CHANNEL_NAME, `Mage Ölüm: ${mage - 1} - Toplam Ölüm: ${total - 1} ama bu hile !!!`);
+})
