@@ -4,7 +4,6 @@
   "description": "Eldwyn Twitch Bot",
   "main": "src",
   "scripts": {
-    "server": "nodemon .",
     "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
