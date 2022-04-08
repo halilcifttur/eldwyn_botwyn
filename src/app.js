@@ -43,51 +43,51 @@ client.on('message', async (channel, tags, message, self) => {
   }
 });
 
-// Ölüm Sayacı Artırma:
-client.on('message', async (channel, tags, message, self) => {
+// // Ölüm Sayacı Artırma:
+// client.on('message', async (channel, tags, message, self) => {
 
-  if (message.toLowerCase() === '!öldü')
-  {
-    const allowedUsers = await db.getWhitelist();
-    const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
-    if (isWriterExist || tags.username === 'elongef')
-    {
-      const counter = await db.getCounter();
-      const id = counter[0];
-      const total = counter[1];
-      const mage = counter[2];
+//   if (message.toLowerCase() === '!öldü')
+//   {
+//     const allowedUsers = await db.getWhitelist();
+//     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
+//     if (isWriterExist || tags.username === 'elongef')
+//     {
+//       const counter = await db.getCounter();
+//       const id = counter[0];
+//       const total = counter[1];
+//       const mage = counter[2];
 
-      await db.updateCounter(id, total + 1, mage + 1);
+//       await db.updateCounter(id, total + 1, mage + 1);
 
-      const sentences = await db.getDescription();
-      const randomSentence = Math.floor(Math.random() * sentences.length);
-      client.say(channel, `Mage Ölüm: ${mage + 1} - Toplam Ölüm: ${total + 1} ${sentences[randomSentence]}`);
-      return;
-    }
-  }
-});
+//       const sentences = await db.getDescription();
+//       const randomSentence = Math.floor(Math.random() * sentences.length);
+//       client.say(channel, `Mage Ölüm: ${mage + 1} - Toplam Ölüm: ${total + 1} ${sentences[randomSentence]}`);
+//       return;
+//     }
+//   }
+// });
 
-// Ölüm Sayıcı Eksiltme:
-client.on('message', async (channel, tags, message, self) => {
+// // Ölüm Sayıcı Eksiltme:
+// client.on('message', async (channel, tags, message, self) => {
 
-  if (message.toLowerCase() === '!ölmedi')
-  {
-    const allowedUsers = await db.getWhitelist();
-    const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
-    if (isWriterExist || tags.username === 'elongef')
-    {
-      const counter = await db.getCounter();
-      const id = counter[0];
-      const total = counter[1];
-      const mage = counter[2];
+//   if (message.toLowerCase() === '!ölmedi')
+//   {
+//     const allowedUsers = await db.getWhitelist();
+//     const isWriterExist = (allowedUsers.indexOf(tags.username) > -1);
+//     if (isWriterExist || tags.username === 'elongef')
+//     {
+//       const counter = await db.getCounter();
+//       const id = counter[0];
+//       const total = counter[1];
+//       const mage = counter[2];
 
-      await db.updateCounter(id, total - 1, mage - 1);
+//       await db.updateCounter(id, total - 1, mage - 1);
 
-      client.say(channel, `Mage Ölüm: ${mage - 1} - Toplam Ölüm: ${total - 1} ama bu hile !!!`);
-      return;
-    }
-  }
-});
+//       client.say(channel, `Mage Ölüm: ${mage - 1} - Toplam Ölüm: ${total - 1} ama bu hile !!!`);
+//       return;
+//     }
+//   }
+// });
 
 // Ölüm Sayacı için Yetki Verme:
 client.on('message', async (channel, tags, message, self) => {
@@ -202,7 +202,7 @@ client.on('message', async (channel, tags, message, self) => {
     const counter = await db.getCounter();
     const id = counter[0];
     db.updateCounter(id, total, mage);
-    client.say(channel , `Ölüm Sayacı Mage Ölüm: ${mage} - Toplam Ölüm: ${total} olarak güncellendi.`)
+    client.say(channel , `Ölüm | Yeni: ${mage} - Toplam: ${total} olarak güncellendi.`)
     return;
   }
 });
@@ -231,7 +231,7 @@ server.get('/dead', async (req, res) => {
 
     const sentences = await db.getDescription();
     const randomSentence = Math.floor(Math.random() * sentences.length);
-    client.say(process.env.CHANNEL_NAME, `Mage Ölüm: ${mage + 1} - Toplam Ölüm: ${total + 1} ${sentences[randomSentence]}`);
+    client.say(process.env.CHANNEL_NAME, `Ölüm | Yeni: ${mage + 1} - Toplam: ${total + 1} ${sentences[randomSentence]}`);
 })
 
 // API ile Ölüm Sayacı Eksiltme:
@@ -243,5 +243,5 @@ server.get('/notdead', async (req, res) => {
 
     await db.updateCounter(id, total - 1, mage - 1);
 
-    client.say(process.env.CHANNEL_NAME, `Mage Ölüm: ${mage - 1} - Toplam Ölüm: ${total - 1} ama bu hile !!!`);
+    client.say(process.env.CHANNEL_NAME, `Ölüm | Yeni: ${mage - 1} - Toplam: ${total - 1} ama bu hile !!!`);
 })
