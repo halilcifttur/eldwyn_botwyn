@@ -196,8 +196,8 @@ client.on('message', async (channel, tags, message, self) => {
     }
 
     const splittedMessage = message.split('$')[1];
-    const total = parseInt(splittedMessage.split('-')[0]);
-    const mage = parseInt(splittedMessage.split('-')[1]);
+    const mage = parseInt(splittedMessage.split('-')[0]);
+    const total = parseInt(splittedMessage.split('-')[1]);
 
     const counter = await db.getCounter();
     const id = counter[0];
