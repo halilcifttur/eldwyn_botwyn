@@ -38,7 +38,7 @@ client.on('message', async (channel, tags, message, self) => {
     const total = counter[1];
     const mage = counter[2];
 
-    client.say(channel, `Mage Ölüm: ${mage} - Toplam Ölüm: ${total}`);
+    client.say(channel, `Ölüm | Yeni: ${mage} - Ölüm: ${total}`);
     return;
   }
 });
