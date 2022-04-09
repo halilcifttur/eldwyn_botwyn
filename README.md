@@ -1,3 +1,3 @@
 # BOTWYN
 
-A Twitch Death Counter Bot for Eldwyn
+A Twitch Death Counter Bot for Twitch Chat
